@@ -1,0 +1,42 @@
+version: '2'
+services:
+  data:
+    image: busybox
+    container_name: busybox
+    volumes:
+      - ~/www:/var/www/html
+      - ~/data:/var/lib/mysql
+    networks:
+     - xarxa
+
+  apache:
+    image: danarox/centos-httpd-php
+    container_name: httpd
+    ports:
+      - "8080:80"
+      - "2223:22"
+    volumes_from:
+      - data
+    networks:
+     - xarxa
+
+  mysql:
+    image: orboan/dcsss-mariadb
+    container_name: mariadb
+    environment:
+      MYSQL_DATABASE: db
+      MYSQL_USER1: www
+      MYSQL_ROOT_PASSWORD: iaw
+    ports:
+      - "3307:3307"
+    volumes_from:
+     - data
+    networks:
+     - xarxa
+
+networks:
+  xarxa:
+    driver: bridge
+    ipam:
+      config:
+       - subnet: 192.168.1.0/24
